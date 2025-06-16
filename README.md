@@ -162,3 +162,5 @@ http://localhost:8080/frontend/index.html
 
 
 Link to the report (https://docs.google.com/document/d/1tD7OmcxQrV7_DMSqvjEki6QW271mmkeKFL_ti4biL3E/edit?usp=drive_link)
+
+Link to the video (https://youtu.be/AVEpAPWDC7c)
