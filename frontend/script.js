@@ -1,8 +1,15 @@
-// frontend/script.js
-
-// Global variables
 let transactions = [];
 let charts = {};
+let isChartsInitialized = false;
+
+// Debounce utility to prevent rapid filter requests
+function debounce(func, wait) {
+  let timeout;
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => func.apply(this, args), wait);
+  };
+}
 
 // Fetch transaction data from API
 async function fetchData(params = {}) {
@@ -15,7 +22,12 @@ async function fetchData(params = {}) {
     }
     transactions = await response.json();
     try {
-      updateCharts(transactions); // Update charts with new data
+      if (!isChartsInitialized) {
+        renderCharts();
+        isChartsInitialized = true;
+      } else {
+        updateCharts(transactions);
+      }
       renderTable(transactions);
     } catch (error) {
       console.error('Error rendering charts or table:', error);
@@ -38,10 +50,20 @@ function formatDate(date) {
 
 // Initialize charts
 function renderCharts() {
-  // Destroy existing charts to prevent canvas reuse errors
-  if (charts.volumeByType) charts.volumeByType.destroy();
-  if (charts.monthlySummary) charts.monthlySummary.destroy();
-  if (charts.paymentDistribution) charts.paymentDistribution.destroy();
+  console.log('Initializing charts');
+  // Destroy existing charts
+  if (charts.volumeByType) {
+    console.log('Destroying volumeByType chart');
+    charts.volumeByType.destroy();
+  }
+  if (charts.monthlySummary) {
+    console.log('Destroying monthlySummary chart');
+    charts.monthlySummary.destroy();
+  }
+  if (charts.paymentDistribution) {
+    console.log('Destroying paymentDistribution chart');
+    charts.paymentDistribution.destroy();
+  }
 
   // Transaction volume by type (bar chart)
   const volumeByTypeCtx = document.getElementById('volume-by-type').getContext('2d');
@@ -69,12 +91,13 @@ function renderCharts() {
       }
     }
   });
+  console.log('Created volumeByType chart');
 
   // Monthly summaries (line chart)
   const monthlySummaryCtx = document.getElementById('monthly-summary').getContext('2d');
   const monthlyData = transactions.reduce((acc, t) => {
     const date = new Date(t.timestamp);
-    if (!isNaN(date)) { // Check if date is valid
+    if (!isNaN(date)) {
       const month = date.toLocaleString('en-US', { year: 'numeric', month: 'short' });
       acc[month] = (acc[month] || 0) + (t.amount || 0);
     }
@@ -100,6 +123,7 @@ function renderCharts() {
       }
     }
   });
+  console.log('Created monthlySummary chart');
 
   // Payment/deposit distribution (pie chart)
   const paymentDistCtx = document.getElementById('payment-distribution').getContext('2d');
@@ -122,16 +146,12 @@ function renderCharts() {
       plugins: { legend: { position: 'right' } }
     }
   });
+  console.log('Created paymentDistribution chart');
 }
 
 // Update charts with filtered data
 function updateCharts(filtered) {
-  if (!charts.volumeByType || !charts.monthlySummary || !charts.paymentDistribution) {
-    // Initialize charts if not created
-    renderCharts();
-    return;
-  }
-
+  console.log('Updating charts with new data');
   // Update volume by type
   const typeCounts = filtered.reduce((acc, t) => {
     acc[t.transaction_type] = (acc[t.transaction_type] || 0) + 1;
@@ -140,6 +160,7 @@ function updateCharts(filtered) {
   charts.volumeByType.data.labels = Object.keys(typeCounts);
   charts.volumeByType.data.datasets[0].data = Object.values(typeCounts);
   charts.volumeByType.update();
+  console.log('Updated volumeByType chart');
 
   // Update monthly summaries
   const monthlyData = filtered.reduce((acc, t) => {
@@ -153,6 +174,7 @@ function updateCharts(filtered) {
   charts.monthlySummary.data.labels = Object.keys(monthlyData);
   charts.monthlySummary.data.datasets[0].data = Object.values(monthlyData);
   charts.monthlySummary.update();
+  console.log('Updated monthlySummary chart');
 
   // Update payment/deposit distribution
   const paymentTypes = ['payment', 'incoming', 'bank_deposit'];
@@ -161,12 +183,19 @@ function updateCharts(filtered) {
   );
   charts.paymentDistribution.data.datasets[0].data = paymentCounts;
   charts.paymentDistribution.update();
+  console.log('Updated paymentDistribution chart');
 }
 
 // Render transaction table
 function renderTable(data) {
   const tbody = document.getElementById('transaction-list');
   tbody.innerHTML = '';
+  if (data.length === 0) {
+    const row = document.createElement('tr');
+    row.innerHTML = `<td colspan="8">No transactions match the filters.</td>`;
+    tbody.appendChild(row);
+    return;
+  }
   data.forEach(t => {
     const date = new Date(t.timestamp);
     const row = document.createElement('tr');
@@ -185,7 +214,7 @@ function renderTable(data) {
 }
 
 // Apply filters
-function applyFilters() {
+const debouncedApplyFilters = debounce(function () {
   const params = {};
   const typeFilter = document.getElementById('type-filter').value;
   const dateStart = document.getElementById('date-start').value;
@@ -199,11 +228,15 @@ function applyFilters() {
   if (amountMin && !isNaN(parseInt(amountMin))) params.amount_min = parseInt(amountMin);
   if (amountMax && !isNaN(parseInt(amountMax))) params.amount_max = parseInt(amountMax);
 
+  console.log('Applying filters with params:', params);
   fetchData(params);
-}
+}, 300);
 
 // Event listeners
-document.getElementById('apply-filters').addEventListener('click', applyFilters);
+document.getElementById('apply-filters').addEventListener('click', debouncedApplyFilters);
 
 // Initialize dashboard
-fetchData();
+document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM loaded, fetching initial data');
+  fetchData();
+});
