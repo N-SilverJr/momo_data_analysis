@@ -22,9 +22,8 @@ This fullstack application processes, stores, and visualizes MTN Mobile Money (M
 │   ├── index.html         # Dashboard UI
 │   ├── styles.css         # CSS styling
 │   ├── script.js          # JavaScript for interactivity and Chart.js
-│   └── assets/            # Static assets
 ├── data/
-│   └── sms_data.xml       # Input XML file containing SMS messages
+│   └── modified_sms_v2.xml       # Input XML file containing SMS messages
 ├── README.md              # Project documentation
 └── .gitignore             # Git ignore rules
 ```
@@ -51,7 +50,7 @@ This fullstack application processes, stores, and visualizes MTN Mobile Money (M
 
 ## 📥 Input Format
 
-The XML input file `data/sms_data.xml` contains multiple `<sms>` tags like:
+The XML input file `data/modified_sms_v2.xml` contains multiple `<sms>` tags like:
 
 ```xml
 <sms date="timestamp" body="You have received Rwf 2000 from M-Money on 10-05-24 16:30:58. Transaction ID: 76662021700. New balance: Rwf 2000." />
@@ -145,7 +144,7 @@ http://localhost:8080/frontend/index.html
 
 ## 🧪 Interaction Flow
 
-1. Choose filter options (e.g., "Cash Out", May 2024, 1000–5000 RWF).
+1. Choose filter options (e.g., "Incoming", May 2024, 1000–5000 RWF).
 2. Click **Apply Filters** to update the dashboard.
 3. Click **Reset Filters** to display all data.
 
@@ -153,26 +152,11 @@ http://localhost:8080/frontend/index.html
 
 ## 👤 Student Information
 
-**Student Name:** Nshuti Shalom Silver Jr  
-**Institution:** [Your School/University]  
-**Course:** [Course Name or Module]  
-**Instructor:** [Instructor Name]  
-
----
-
-## 📌 Notes
-
-- Ensure `sms_data.xml` is well-formed before running the parser.
-- Keep your `db.sqlite` updated by re-running `db_setup.py` if new data is added.
-- All logs can be reviewed in `backend/logs/errors.log`.
-
----
+**Student Name:** Nshuti Shalom Silver Jr
 
 ## ✅ Future Improvements
 
+- Parse way more data from the xml file.
 - Add authentication for secure API access.
 - Migrate to PostgreSQL for larger datasets.
 - Export filtered results to CSV or Excel.
-- Deploy on cloud for remote access.
-
----
