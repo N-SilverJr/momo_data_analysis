@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoMo Data Analysis Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <!-- Chart.js CDN for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <header>
+        <h1>MTN MoMo Transaction Dashboard</h1>
+    </header>
+    <main>
+        <section id="filters">
+            <h2>Search & Filter Transactions</h2>
+            <div class="filter-group">
+                <label for="type-filter">Transaction Type:</label>
+                <select id="type-filter">
+                    <option value="">All Types</option>
+                    <option value="incoming">Incoming Money</option>
+                    <option value="payment">Payment</option>
+                    <option value="transfer">Transfer</option>
+                    <option value="bank_deposit">Bank Deposit</option>
+                    <option value="airtime">Airtime Purchase</option>
+                    <option value="bill_payment">Bill Payment</option>
+                    <option value="withdrawal">Withdrawal</option>
+                    <option value="bank_transfer">Bank Transfer</option>
+                    <option value="bundle_purchase">Bundle Purchase</option>
+                    <option value="third_party">Third Party</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="date-filter">Date Range:</label>
+                <input type="date" id="date-start">
+                <input type="date" id="date-end">
+            </div>
+            <div class="filter-group">
+                <label for="amount-filter">Amount Range (RWF):</label>
+                <input type="number" id="amount-min" placeholder="Min">
+                <input type="number" id="amount-max" placeholder="Max">
+            </div>
+            <button id="apply-filters">Apply Filters</button>
+        </section>
+        <section id="visualizations">
+            <h2>Transaction Insights</h2>
+            <div class="chart-container">
+                <canvas id="volume-by-type"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="monthly-summary"></canvas>
+            </div>
+            <div class="chart-container">
+                <canvas id="payment-distribution"></canvas>
+            </div>
+        </section>
+        <section id="details">
+            <h2>Transaction Details</h2>
+            <table id="transaction-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Type</th>
+                        <th>Amount (RWF)</th>
+                        <th>Recipient</th>
+                        <th>Reference</th>
+                        <th>Balance (RWF)</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="transaction-list"></tbody>
+            </table>
+        </section>
+    </main>
+    <script src="script.js"></script>
+</body>
+</html>
